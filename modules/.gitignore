@@ -1,0 +1,17 @@
+# .gitignore
+
+# Virtual environment folder
+venv/
+
+# Python cache files and directories
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.cache
+
+# Jupyter Notebook
+.ipynb_checkpoints/*
+
+.DS_STORE
