@@ -6,14 +6,18 @@ from upwork.routers.jobs import profile
 from datetime import datetime, timedelta
 from modules.database import create_tables, insert_applications_and_questions
 import json
+from rich.console import Console
+
+console = Console()
 
 def get_job_applications(client):
     # Uses this API:
     # https://developers.upwork.com/?lang=python#contracts-and-offers_list-job-applications-as-freelancer
-
+    console.print("Initializing database...", style="bold cyan")
     create_tables()
 
     # Instantiate the applications API with your client
+    console.print("Setting up applications API...", style="bold cyan")
     app_api = applications.Api(client)
 
     # Read the days back from the .env file for job applications, defaulting to 7 if not set
@@ -29,11 +33,13 @@ def get_job_applications(client):
     }
 
     statuses_to_check = ["submitted", "archived"]
+    saved_count = 0  # Initialize saved_count variable
 
     for status in statuses_to_check:
         optional_params["status"] = status
         # Flag to check if there are applications to process
         has_applications = True
+        console.print(f"Processing status: {status}...", style="bold cyan")
 
         while has_applications:
             # Make the API call and store the result
@@ -48,6 +54,9 @@ def get_job_applications(client):
             # Save the recent applications to a SQLite database
             insert_applications_and_questions(recent_applications, client, get_job_details)
 
+            # Update the saved_count variable with the number of saved applications
+            saved_count += len(recent_applications)
+
             if not recent_applications:  # No recent applications in the current batch
                 has_applications = False
 
@@ -61,6 +70,7 @@ def get_job_applications(client):
                         # Update the cursor to the next offset value
                         encoded_offset = result["data"]["paging"]["offset"]
                         optional_params["cursor"] = encoded_offset
+                        console.print(f"Moving to the next cursor for status: {status}...", style="bold cyan")
                     else:
                         # No more applications available
                         has_applications = False
@@ -69,7 +79,7 @@ def get_job_applications(client):
                     has_applications = False
 
     # Print the result
-    print("Job Applications saved to database.")
+    console.print(f"{saved_count} Job Applications saved to the database.", style="bold green")
 
 def get_job_details(client, job_key):
     # Uses this API:
@@ -84,7 +94,6 @@ def get_job_details(client, job_key):
     return job_details
 
 def get_user_info(client):
-    print("My info")
+    console.print("My info", style="bold")
     pprint(auth.Api(client).get_user_info())
-
     return

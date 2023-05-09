@@ -1,9 +1,10 @@
 import upwork
-from pprint import pprint
-from upwork.routers import auth
 import json
 import os.path
 from dotenv import load_dotenv
+from rich.console import Console
+
+console = Console()
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -39,13 +40,13 @@ def authenticate():
         config.token
     except AttributeError:
         authorization_url, state = client.get_authorization_url()
-        # cover "state" flow if needed
-        authz_code = input(
-            "Please enter the full callback URL you get "
-            "following this link:\n{0}\n\n> ".format(authorization_url)
-        )
+        
+        # Print the link message with Rich
+        console.print(f"Please enter the full callback URL you get following this link: [link={authorization_url}]{authorization_url}[/link]", style="bold")
 
-        print("Retrieving access and refresh tokens.... ")
+        authz_code = input("> ")
+
+        console.print("Retrieving access and refresh tokens.... ", style="bold")
         token = client.get_access_token(authz_code)
         
         # WARNING: the access token will be refreshed automatically for you
@@ -53,8 +54,7 @@ def authenticate():
         # old token accordingly in your security storage. Call client.get_actual_config
         # periodically to sync-up the data
 
-        pprint(token)
-        print("OK")
+        console.print("Access and refresh tokens received! Saving to 'token.json'...", style="bold green")
 
         with open('token.json', 'w') as f:
             json.dump(token, f)
