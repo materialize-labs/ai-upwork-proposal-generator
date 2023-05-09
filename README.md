@@ -1,4 +1,4 @@
-# Upwork OAuth2 Python App
+# Upwork Job and Application Scraper
 
 This is a Python app that demonstrates the authentication process with the Upwork API using OAuth 2.0, retrieves job applications for a freelancer, and stores the data in a SQLite database.
 
