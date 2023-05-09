@@ -11,8 +11,6 @@ consumer_key = os.getenv("UPWORK_CLIENT_KEY")
 consumer_secret = os.getenv("UPWORK_CLIENT_SECRET")
 
 def authenticate():
-    print("Emulating desktop app")
-
     # Check if token file exists
     if os.path.isfile('token.json'):
         with open('token.json', 'r') as f:
@@ -57,7 +55,6 @@ def authenticate():
 
         pprint(token)
         print("OK")
-
 
         with open('token.json', 'w') as f:
             json.dump(token, f)

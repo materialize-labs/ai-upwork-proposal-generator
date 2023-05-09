@@ -1,3 +1,4 @@
+import os
 from pprint import pprint
 from upwork.routers import auth
 from upwork.routers.hr.freelancers import applications
@@ -6,18 +7,20 @@ from datetime import datetime, timedelta
 from modules.database import create_tables, insert_applications_and_questions
 import json
 
-
 def get_job_applications(client):
     # Uses this API:
     # https://developers.upwork.com/?lang=python#contracts-and-offers_list-job-applications-as-freelancer
-    
+
     create_tables()
 
     # Instantiate the applications API with your client
     app_api = applications.Api(client)
 
-    # Get the timestamp from 3 months ago
-    timestamp_from = int((datetime.now() - timedelta(days=1)).timestamp())
+    # Read the days back from the .env file for job applications, defaulting to 7 if not set
+    job_applications_days_back = int(os.environ.get("JOB_APPLICATIONS_DAYS_BACK", 7))
+
+    # Get the timestamp from the specified days back
+    timestamp_from = int((datetime.now() - timedelta(days=job_applications_days_back)).timestamp())
 
     # Define any optional parameters that you need
     optional_params = {
@@ -83,4 +86,5 @@ def get_job_details(client, job_key):
 def get_user_info(client):
     print("My info")
     pprint(auth.Api(client).get_user_info())
+
     return

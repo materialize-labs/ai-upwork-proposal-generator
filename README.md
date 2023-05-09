@@ -1,12 +1,15 @@
+Here's the updated README file with the latest information about the app and a mention of the `.env.example` file:
+
 # Upwork OAuth2 Python App
 
-This is a simple Python app that demonstrates the authentication process with the Upwork API using OAuth 2.0 and retrieves job applications for a freelancer.
+This is a Python app that demonstrates the authentication process with the Upwork API using OAuth 2.0, retrieves job applications for a freelancer, and stores the data in a SQLite database.
 
 ## Features
 
 - Authenticate with the Upwork API
 - Retrieve the user's information
 - List job applications as a freelancer
+- Store job applications and associated details in a SQLite database
 
 ## Prerequisites
 
@@ -38,7 +41,12 @@ This is a simple Python app that demonstrates the authentication process with th
   pip3 install -r requirements.txt
   ```
 
-5. Set up your client key (`UPWORK_CLIENT_KEY`) and client secret (`UPWORK_CLIENT_SECRET`) in a `.env` file in the project root directory:
+5. Copy the `.env.example` file to a `.env` in the project root directory:
+  ```
+  cp .env.example .env
+  ```
+
+6. Set up your client key (`UPWORK_CLIENT_KEY`) and client secret (`UPWORK_CLIENT_SECRET`) in the `.env` file:
   ```
   UPWORK_CLIENT_KEY=your_client_key
   UPWORK_CLIENT_SECRET=your_client_secret
@@ -61,7 +69,7 @@ This is a simple Python app that demonstrates the authentication process with th
 
 4. After authorizing the app, copy the full callback URL (containing the authorization code) and paste it in the terminal window when prompted.
 
-5. The app will now display the authenticated user's information and the list of job applications.
+5. The app will now display the authenticated user's information and store the list of job applications and associated details in the SQLite database.
 
 ## Adding More API Calls
 
