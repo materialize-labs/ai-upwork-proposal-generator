@@ -1,19 +1,23 @@
 from pprint import pprint
 from upwork.routers import auth
 from upwork.routers.hr.freelancers import applications
-from upwork.routers.hr import jobs
+from upwork.routers.jobs import profile
 from datetime import datetime, timedelta
 from modules.database import create_tables, insert_applications_and_questions
 import json
 
+
 def get_job_applications(client):
+    # Uses this API:
+    # https://developers.upwork.com/?lang=python#contracts-and-offers_list-job-applications-as-freelancer
+    
     create_tables()
 
     # Instantiate the applications API with your client
     app_api = applications.Api(client)
 
     # Get the timestamp from 3 months ago
-    timestamp_from = int((datetime.now() - timedelta(days=90)).timestamp())
+    timestamp_from = int((datetime.now() - timedelta(days=1)).timestamp())
 
     # Define any optional parameters that you need
     optional_params = {
@@ -39,7 +43,7 @@ def get_job_applications(client):
             ))
 
             # Save the recent applications to a SQLite database
-            insert_applications_and_questions(recent_applications)
+            insert_applications_and_questions(recent_applications, client, get_job_details)
 
             if not recent_applications:  # No recent applications in the current batch
                 has_applications = False
@@ -65,15 +69,18 @@ def get_job_applications(client):
     print("Job Applications saved to database.")
 
 def get_job_details(client, job_key):
-    # Instantiate the jobs API with your client
-    job_api = jobs.Api(client)
+    # Uses this API:
+    # https://developers.upwork.com/?lang=python#jobs_get-job-profile
 
-    # Get the job details by key
-    job_details = job_api.get_job(job_key)
+    # Instantiate the jobs API with your client
+    profile_api = profile.Api(client)
+
+    # Get the job details by key (sent as "opening_ciphertext")
+    job_details = profile_api.get_specific(job_key)
 
     return job_details
 
 def get_user_info(client):
-    # print("My info")
-    # pprint(auth.Api(client).get_user_info())
+    print("My info")
+    pprint(auth.Api(client).get_user_info())
     return

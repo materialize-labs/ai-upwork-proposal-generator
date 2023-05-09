@@ -10,7 +10,7 @@ load_dotenv()  # Load environment variables from .env file
 consumer_key = os.getenv("UPWORK_CLIENT_KEY")
 consumer_secret = os.getenv("UPWORK_CLIENT_SECRET")
 
-def get_desktop_client():
+def authenticate():
     print("Emulating desktop app")
 
     # Check if token file exists
