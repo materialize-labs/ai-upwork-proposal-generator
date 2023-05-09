@@ -17,3 +17,6 @@ __pycache__/
 .DS_STORE
 
 *.json
+
+# sqlite
+*.db

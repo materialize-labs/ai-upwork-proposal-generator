@@ -1,6 +1,7 @@
 from pprint import pprint
 from upwork.routers import auth
 from upwork.routers.hr.freelancers import applications
+from modules.database import create_table, insert_applications
 import json
 
 def get_job_applications(client):
@@ -16,12 +17,12 @@ def get_job_applications(client):
     # Make the API call and store the result
     result = app_api.get_list(optional_params)
 
-    # Save the result to a JSON file
-    with open('applications.json', 'w') as f:
-        json.dump(result, f, indent=4)
+    # Save the result to a SQLite database
+    create_table()
+    insert_applications(result["data"]["applications"])
 
     # Print the result
-    print("Result saved to \"applications.json\".")
+    print("Job Applications saved to database.")
 
 def get_user_info(client):
     # print("My info")
