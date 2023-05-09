@@ -1,5 +1,3 @@
-Here's the updated README file with the latest information about the app and a mention of the `.env.example` file:
-
 # Upwork OAuth2 Python App
 
 This is a Python app that demonstrates the authentication process with the Upwork API using OAuth 2.0, retrieves job applications for a freelancer, and stores the data in a SQLite database.
