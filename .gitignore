@@ -1,5 +1,8 @@
 # .gitignore
 
+# Env file
+.env
+
 # Virtual environment folder
 venv/
 
