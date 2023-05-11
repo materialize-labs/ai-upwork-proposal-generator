@@ -55,12 +55,12 @@ Follow these steps to set up the AI-Powered Upwork Proposal Generator on your lo
 
 1. Clone the repository:
   ```
-  git clone https://github.com/yourusername/upwork_oauth2.git
+  git clone git@github.com:materialize-labs/ai-upwork-proposal-generator.git
   ```
 
 2. Change to the project root directory:
   ```
-  cd upwork_oauth2
+  cd ai-upwork-proposal-generator
   ```
 
 3. Create a virtual environment and activate it:
