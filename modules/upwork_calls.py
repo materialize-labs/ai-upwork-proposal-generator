@@ -14,7 +14,6 @@ def get_job_applications(client):
     # Uses this API:
     # https://developers.upwork.com/?lang=python#contracts-and-offers_list-job-applications-as-freelancer
     console.print("Initializing database...", style="bold cyan")
-    create_tables()
 
     # Instantiate the applications API with your client
     console.print("Setting up applications API...", style="bold cyan")

@@ -1,5 +1,6 @@
 import argparse
 from modules.authentication import authenticate
+from modules.database import create_tables
 from modules.upwork_calls import get_job_applications, get_job_details
 from modules.proposal_generator import (fetch_job_application_data,
                                         prepare_training_data,
@@ -19,6 +20,8 @@ parser.add_argument("--delete-model", metavar="MODEL_ID", help="Delete a fine-tu
 parser.add_argument("--generate-single-job-proposal", action="store_true", help="Generate proposal for a single Upwork job using a fine-tuned model")
 
 args = parser.parse_args()
+
+create_tables()
 
 if __name__ == "__main__":
     client = authenticate()
@@ -49,9 +52,11 @@ if __name__ == "__main__":
         model_id = input("Enter the fine-tuned model ID: ").strip()
         
         job = get_job_details(client, job_id)
+        print(job())
+        exit()
         
         input_text = f"{job['profile']['job_category_level_one']}\n{job['profile']['job_category_level_two']}\n{job['profile']['job_type']}\n{job['profile']['op_description']}\n{job['profile']['op_pref_location']}\n{job['profile']['op_pref_hourly_rate_min']}-{job['profile']['op_pref_hourly_rate_max']}\n{job['profile']['op_engagement']}\n\n###\n\n"
-        completions = generate_completions(model_id, input_text)
+        completions = generate_completions(model_id, input_text, 1024, " END", 1, 0.8)
         
         print("\nGenerated Proposal:\n")
         print(completions)
