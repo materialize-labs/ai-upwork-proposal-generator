@@ -1,0 +1,18 @@
+|____requirements.txt
+|____token.json
+|____training_data.jsonl
+|____README.md
+|____.gitignore
+|____.env
+|____app.py
+|____applications.json
+|____.env.example
+|____main.py
+|____completions.json
+| |____proposal_generator.py
+| |____database.py
+| |____authentication.py
+| |____upwork_calls.py
+| |____openai_client.py
+|____output.txt
+|____applications.db
