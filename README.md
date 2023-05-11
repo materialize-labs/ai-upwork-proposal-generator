@@ -22,13 +22,13 @@ An AI-driven Python application to fine-tune OpenAI models using your Upwork job
     - [6.2 Adding new fine-tuning tasks](#adding-new-fine-tuning-tasks)
 7. [License](#license)
 
-## Introduction
+## 1. Introduction
 
 AI-Powered Upwork Proposal Generator is a Python application that leverages the power of OpenAI's GPT-3 models to help freelancers create tailored and professionally written proposals for Upwork job posts. By training the AI model on your past job applications, the tool learns your unique writing style and job preferences, enabling it to generate personalized and compelling proposals for new job posts. The application utilizes a SQLite database to store job applications, job details, fine-tuned models, and generated proposals.
 
 Using this tool can save you time spent on crafting proposals and increase the chances of winning more jobs. It simplifies the proposal generation process, allowing you to focus more on delivering high-quality work to clients.
 
-## Features
+## 2. Features
 
 - Authenticate with your Upwork account to fetch your job application data
 - Retrieve job application details and job post information
@@ -39,7 +39,7 @@ Using this tool can save you time spent on crafting proposals and increase the c
 - Generate personalized job proposals for specific Upwork job posts using the fine-tuned model
 - Store fine-tuned model details, model responses, and generated proposals in the SQLite database
 
-## Prerequisites
+## 3. Prerequisites
 
 Before you can use the AI-Powered Upwork Proposal Generator, ensure that you have the following prerequisites:
 
@@ -49,7 +49,7 @@ Before you can use the AI-Powered Upwork Proposal Generator, ensure that you hav
 - An OpenAI API key
 - A virtual environment tool, such as `virtualenv`
 
-## Setup
+## 4. Setup
 
 Follow these steps to set up the AI-Powered Upwork Proposal Generator on your local machine:
 
@@ -86,34 +86,102 @@ Follow these steps to set up the AI-Powered Upwork Proposal Generator on your lo
   OPENAI_API_KEY=your_openai_api_key
   ```
 
-## Running the App
+## 5. Running the App
 
-1. In a terminal window, run the Flask web server:
-  ```
-  python3 app.py
-  ```
+To run the AI-Powered Upwork Proposal Generator, you will first need to start the Flask web server, which handles authentication. Afterward, you can use various command-line arguments to execute different actions within the application like scraping data, fine-tuning models, or generating proposals. The following subsections will guide you through these steps.
 
-2. In another terminal window, activate the virtual environment and run `main.py` with the desired command-line arguments:
-  ```
-  source venv/bin/activate
-  python3 main.py --flag
-  ```
+### 5.1 Running the Flask web server
 
-  Replace `--flag` with the desired action(s):
-  - `--scrape` - Scrape job applications and job details and save them to the database
-  - `--generate-training` - Generate training data based on stored applications and job details
-  - `--fine-tune` - Fine-tune a new OpenAI model based on the training data
-  - `--list-fine-tunes` - List all fine-tuned models
-  - `--delete-model` - Delete a fine-tuned model
-  - `--generate-single-job-proposal` - Generate a proposal for a single Upwork job using a fine-tuned model
+The application uses the Flask web server to handle the authentication callback from Upwork. Before executing any command-line actions from `main.py`, you need to start the Flask web server by following these steps:
 
-3. When prompted, copy and paste the authorization URL into your web browser to authorize the app.
+1. Open a terminal window and navigate to the project root directory.
+2. Activate the virtual environment:
+   ```
+   source venv/bin/activate
+   ```
+3. Run the Flask web server:
+   ```
+   python3 app.py
+   ```
+The Flask web server will now be running and ready to process the authentication callback when you run `main.py` with the desired command-line arguments.
 
-4. After authorizing the app, copy the full callback URL (containing the authorization code) and paste it in the terminal window when prompted.
+### 5.2 Using command-line arguments
 
-5. The app will now execute the specified action(s).
+The `main.py` script supports several command-line arguments that allow you to perform different actions within the application, such as scraping job data, fine-tuning models, and generating proposals. To use these arguments, follow these steps:
 
-## Customizing and Extending the Application
+1. Open a new terminal window, navigate to the project root directory, and activate the virtual environment:
+   ```
+   source venv/bin/activate
+   ```
+
+2. Run `main.py` with the desired command-line argument by replacing `--flag` with the corresponding action flag:
+   ```
+   python3 main.py --flag
+   ```
+
+The available command-line arguments and their corresponding actions are described in the following subsections (5.2.1 - 5.2.6).
+
+### 5.2.1 Scrape job applications and job details
+
+To scrape job applications and job details and save them in the SQLite database, use the `--scrape` flag:
+
+```
+python3 main.py --scrape
+```
+
+The script will fetch job application data for your Upwork account and store it in the database.
+
+### 5.2.2 Generate training data
+
+To generate training data based on your stored job applications and job details, use the `--generate-training` flag:
+
+```
+python3 main.py --generate-training
+```
+
+This will process your job application data and create a training dataset for fine-tuning the OpenAI model.
+
+### 5.2.3 Fine-tune OpenAI model
+
+To fine-tune a new OpenAI model based on the generated training data, use the `--fine-tune` flag:
+
+```
+python3 main.py --fine-tune
+```
+
+The script will use the training dataset to fine-tune the GPT-3 model, creating a model customized to your job applications.
+
+### 5.2.4 List all fine-tuned models
+
+To list all the fine-tuned models you have created, use the `--list-fine-tunes` flag:
+
+```
+python3 main.py --list-fine-tunes
+```
+
+The script will display a list of your fine-tuned models and their details.
+
+### 5.2.5 Delete a fine-tuned model
+
+To delete a specific fine-tuned model from the database, use the `--delete-model` flag followed by the model ID:
+
+```
+python3 main.py --delete-model <model_id>
+```
+
+Replace `<model_id>` with the actual ID of the model you want to delete.
+
+### 5.2.6 Generate a proposal for a single job
+
+To generate a proposal for a single Upwork job using a fine-tuned model, use the `--generate-single-job-proposal` flag followed by the `--model-id` and `--job-url` flags:
+
+```
+python3 main.py --generate-single-job-proposal --model-id <model_id> --job-url <job_url>
+```
+
+Replace `<model_id>` with the ID of the fine-tuned model you want to use and `<job_url>` with the URL of the Upwork job post you want to create a proposal for. The script will generate a personalized proposal for the specified job post and display it in the terminal.
+
+## 6. Customizing and Extending the Application
 
 The AI-Powered Upwork Proposal Generator can be customized and extended to meet your specific needs. Here's how you can add more functionality:
 
@@ -125,6 +193,6 @@ You can add more Upwork API calls to the `upwork_calls.py` module. Create new fu
 
 You can also customize the `proposal_generator.py` module to fine-tune the OpenAI model for different tasks. Add new functions or modify existing ones to change the inputs, fine-tuning parameters, or training data generation process. This will help you create models that generate better proposals or work on other text generation tasks.
 
-## License
+## 7. License
 
 This project is released under the [Apache License 2.0](LICENSE). By using the AI-Powered Upwork Proposal Generator, you agree to the terms and conditions stated in the license.
