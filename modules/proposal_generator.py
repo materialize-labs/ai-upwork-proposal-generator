@@ -44,7 +44,7 @@ def upload_training_data(file_path):
 
 def create_fine_tuned_model(training_file_id, model="davinci"):
     create_tables()
-    
+
     result = openai.FineTune.create(
         training_file=training_file_id,
         model=model)
@@ -64,6 +64,12 @@ def delete_fine_tuned_model(model_id):
 def generate_completions(model, prompt):
     response = openai.Completion.create(
         model=model,
-        prompt=prompt
+        prompt=prompt,
+        max_tokens=100
     )
+
+    # Save the response to a JSON file
+    with open("completions.json", "w") as f:
+        json.dump(response, f, ensure_ascii=False, indent=4)
+
     return response

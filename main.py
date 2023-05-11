@@ -7,7 +7,8 @@ from modules.proposal_generator import (fetch_job_application_data,
                                         upload_training_data,
                                         create_fine_tuned_model,
                                         list_fine_tuned_models,
-                                        delete_fine_tuned_model)
+                                        delete_fine_tuned_model,
+                                        generate_completions)
 
 parser = argparse.ArgumentParser(description="Upwork API scraper and proposal generator")
 parser.add_argument("--scrape", action="store_true", help="Scrape Upwork jobs data")
@@ -49,8 +50,8 @@ if __name__ == "__main__":
         
         job = get_job_details(client, job_id)
         
-        input_text = f"{job['job_category_level_one']}\n{job['job_category_level_two']}\n{job['job_type']}\n{job['description']}\n{job['location']}\n{job['min_hourly_rate']}-{job['max_hourly_rate']}\n{job['engagement']}\n\n###\n\n"
+        input_text = f"{job['profile']['job_category_level_one']}\n{job['profile']['job_category_level_two']}\n{job['profile']['job_type']}\n{job['profile']['op_description']}\n{job['profile']['op_pref_location']}\n{job['profile']['op_pref_hourly_rate_min']}-{job['profile']['op_pref_hourly_rate_max']}\n{job['profile']['op_engagement']}\n\n###\n\n"
         completions = generate_completions(model_id, input_text)
         
         print("\nGenerated Proposal:\n")
-        print(completions.choices[0].text.strip())
+        print(completions)
