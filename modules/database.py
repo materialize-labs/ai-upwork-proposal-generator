@@ -222,3 +222,15 @@ def insert_model_response(prompt, model, max_tokens, stop, n, temperature, respo
     conn.commit()
     cur.close()
     conn.close()
+
+def get_last_fine_tuned_model():
+    conn = sqlite3.connect("applications.db")
+    cur = conn.cursor()
+    cur.execute("SELECT fine_tuned_model FROM fine_tuned_models ORDER BY created_at DESC LIMIT 1")
+    result = cur.fetchone()
+    conn.close()
+
+    if result:
+        return result[0]
+    else:
+        return None

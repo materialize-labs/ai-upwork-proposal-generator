@@ -1,6 +1,7 @@
 import sqlite3
 import json
 import openai
+import time
 from modules.database import insert_fine_tuned_model, insert_model_response
 
 def fetch_job_application_data():
@@ -12,7 +13,8 @@ def fetch_job_application_data():
     SELECT jobs.job_category_level_one, jobs.job_category_level_two,
            jobs.description, jobs.engagement, applications.cover_letter
     FROM jobs
-    JOIN applications ON jobs.id = applications.job_id;
+    JOIN applications ON jobs.id = applications.job_id
+    LIMIT 10;
     """
     cur.execute(query)
     records = cur.fetchall()
