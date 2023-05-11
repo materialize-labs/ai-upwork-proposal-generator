@@ -61,6 +61,18 @@ def create_tables():
     )
     """)
 
+    # Create the fined_tuned_models table
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS fine_tuned_models (
+        id TEXT PRIMARY KEY,
+        created_at INTEGER NOT NULL,
+        organization_id TEXT,
+        model TEXT NOT NULL,
+        status TEXT NOT NULL,
+        fine_tuned_model TEXT
+    )
+    """)
+
     conn.commit()
     conn.close()
 
@@ -148,4 +160,20 @@ def insert_applications_and_questions(applications, client, get_job_details):
                   qa["answer"]))
 
     conn.commit()
+    conn.close()
+
+def insert_fine_tuned_model(data):
+    conn = sqlite3.connect("applications.db")
+    cur = conn.cursor()
+     
+    fine_tuned_model = (data["id"], data["created_at"], data["organization_id"],
+                        data["model"], data["status"], data.get("fine_tuned_model", None))
+
+    cur.execute("""
+    INSERT INTO fine_tuned_models (id, created_at, organization_id, model, status, fine_tuned_model)
+    VALUES (?, ?, ?, ?, ?, ?)
+    """, fine_tuned_model)
+     
+    conn.commit()
+    cur.close()
     conn.close()

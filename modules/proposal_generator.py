@@ -1,5 +1,7 @@
 import sqlite3
 import json
+import openai
+from modules.database import create_tables, insert_fine_tuned_model
 
 def fetch_job_application_data():
     conn = sqlite3.connect('applications.db')
@@ -24,12 +26,44 @@ def prepare_training_data(records):
 
     for record in records:
         input_text = f"{record['job_category_level_one']}\n{record['job_category_level_two']}\n{record['job_type']}\n{record['description']}\n{record['location']}\n{record['min_hourly_rate']}-{record['max_hourly_rate']}\n{record['engagement']}"
-        output_text = record['cover_letter']
-        training_example = f"{input_text}\n<|start|>\n{output_text}\n<|end|>"
+        output_text = f" {record['cover_letter']}"
+        training_example = {"prompt": input_text + "\n\n###\n\n", "completion": output_text + "\n"}
         training_data.append(training_example)
 
     return training_data
 
-def save_training_data_to_json(training_data, file_path):
+def save_training_data_to_jsonl(training_data, file_path):
     with open(file_path, 'w') as f:
-        json.dump(training_data, f)
+        for example in training_data:
+            f.write(json.dumps(example) + '\n')
+
+def upload_training_data(file_path):
+    with open(file_path, "rb") as f:
+        response = openai.File.create(purpose="fine-tune", file=f)
+    return response["id"]
+
+def create_fine_tuned_model(training_file_id, model="davinci"):
+    create_tables()
+    
+    result = openai.FineTune.create(
+        training_file=training_file_id,
+        model=model)
+
+    # Insert the newly created fine tuned model details into the database
+    insert_fine_tuned_model(result)
+
+    return result
+
+def list_fine_tuned_models():
+    return openai.FineTune.list()
+
+def delete_fine_tuned_model(model_id):
+    result = openai.Model.delete(model_id)
+    return result
+
+def generate_completions(model, prompt):
+    response = openai.Completion.create(
+        model=model,
+        prompt=prompt
+    )
+    return response
