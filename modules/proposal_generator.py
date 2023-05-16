@@ -2,7 +2,14 @@ import sqlite3
 import json
 import openai
 import time
+from tiktoken import get_encoding
 from modules.database import insert_fine_tuned_model, insert_model_response
+from modules import openai_client
+
+encoding = get_encoding("cl100k_base")
+
+def count_tokens(text):
+    return len(encoding.encode(text))
 
 def fetch_job_application_data():
     conn = sqlite3.connect('applications.db')
@@ -10,8 +17,8 @@ def fetch_job_application_data():
     cur = conn.cursor()
 
     query = """
-    SELECT jobs.job_category_level_one, jobs.job_category_level_two,
-           jobs.description, jobs.engagement, applications.cover_letter
+    SELECT jobs.job_category_level_one, jobs.job_category_level_two, jobs.description,
+           jobs.engagement, applications.cover_letter
     FROM jobs
     JOIN applications ON jobs.id = applications.job_id
     LIMIT 10;
@@ -21,6 +28,18 @@ def fetch_job_application_data():
     conn.close()
 
     return records
+
+def prepare_prompt_data(records):
+    json_data = []
+
+    for record in records:
+        node = {
+            'job_description': record['description'],
+            'cover_letter': record['cover_letter']
+        }
+        json_data.append(node)
+
+    return json_data
 
 def prepare_training_data(records):
     # Convert records to a list of dictionaries
@@ -41,9 +60,10 @@ def prepare_training_data(records):
     
     return jsonl_data
 
-def save_training_data_to_jsonl(data, filename):
-    with open(filename, 'w') as f:
-        f.write(data)
+def save_data_to_json(data, file_path):
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json_string = json.dumps(data, ensure_ascii=False, indent=2)
+        f.write(json_string)
 
 def upload_training_data(file_path):
     with open(file_path, "rb") as f:
@@ -84,3 +104,45 @@ def generate_completions(model, prompt, max_tokens, stop, n, temperature):
     insert_model_response(prompt, model, max_tokens, stop, n, temperature, response)
 
     return response
+
+def generate_cover_letter(new_job_description):
+
+    # Load prompt data
+    with open("prompt_data.json", "r") as f:
+        prompt_data = json.load(f)
+
+    # Set up a message history for the conversation
+    messages = [{"role": "system", "content": "You are an assistant that helps in generating cover letters based on previous job descriptions and cover letters."}]
+
+    # Token limit for GPT-4
+    token_limit = 4096
+
+    # Add examples, staying within the token limit
+    total_tokens = 0
+    for example in prompt_data:
+        job_message = f"Job description: {example['job_description']}"
+        cover_message = f"Cover letter: {example['cover_letter']}"
+        
+        new_tokens = count_tokens(job_message) + count_tokens(cover_message) + 4  # Adding tokens for user and assistant roles, and some formatting tokens
+        if total_tokens + new_tokens + 50 < token_limit:  # Saving 50 tokens for new instruction and response
+            messages.append({"role": "user", "content": job_message})
+            messages.append({"role": "assistant", "content": cover_message})
+            total_tokens += new_tokens
+        else:
+            break
+
+    messages.append({"role": "user", "content": f"Based on previous cover letters, generate a cover letter for this job description: {new_job_description}"})
+
+    # Make the API call
+    response = openai.ChatCompletion.create(
+        model="gpt-4",  # Assuming this is the model you want to use
+        messages=messages,
+    )
+
+    # Extract the generated cover letter
+    generated_cover_letter = response['choices'][0]['message']['content']
+    print(response)
+    # Save the response to a JSON file
+    with open('cover_letter.json', 'w') as f:
+        json.dump(response, f, ensure_ascii=False, indent=4)
+    return generated_cover_letter

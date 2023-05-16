@@ -6,23 +6,27 @@ from modules.database import create_tables, get_last_fine_tuned_model
 from modules.upwork_calls import get_job_applications, get_job_details
 from modules.proposal_generator import (fetch_job_application_data,
                                         prepare_training_data,
-                                        save_training_data_to_jsonl,
+                                        prepare_prompt_data,
+                                        save_data_to_json,
                                         upload_training_data,
                                         create_fine_tuned_model,
                                         list_fine_tuned_models,
                                         delete_fine_tuned_model,
-                                        generate_completions)
+                                        generate_completions,
+                                        generate_cover_letter)
 
 console = Console()
 create_tables()
 
 parser = argparse.ArgumentParser(description="Upwork API scraper and proposal generator")
 parser.add_argument("--scrape", action="store_true", help="Scrape Upwork jobs data")
+parser.add_argument("--generate-prompt-data", action="store_true", help="Generate a json of prompt engineering data.")
 parser.add_argument("--generate-training", action="store_true", help="Generate training data from scraped job data")
 parser.add_argument("--fine-tune", action="store_true", help="Create a fine-tuned model")
 parser.add_argument("--list-fine-tunes", action="store_true", help="List all fine-tuned models")
 parser.add_argument("--delete-model", metavar="MODEL_ID", help="Delete a fine-tuned model")
 parser.add_argument("--generate-single-job-proposal", action="store_true", help="Generate proposal for a single Upwork job using a fine-tuned model")
+parser.add_argument("--generate-cover-letter", action="store_true", help="Generate cover letter for a single Upwork job using ChatComplete")
 
 args = parser.parse_args()
 
@@ -33,11 +37,17 @@ if __name__ == "__main__":
     if args.scrape:
         get_job_applications(client)
 
+    # Command to generate the prompt engineering data based on the application and job details in the DB
+    if args.generate_prompt_data:
+        records = fetch_job_application_data()
+        training_data = prepare_prompt_data(records)
+        save_data_to_json(training_data, "prompt_data.json")
+
     # Command to generate the training data based on the application and job details in the DB
     if args.generate_training:
         records = fetch_job_application_data()
         training_data = prepare_training_data(records)
-        save_training_data_to_jsonl(training_data, "training_data.jsonl")
+        save_data_to_json(training_data, "training_data.jsonl")
 
     # Fine tune a new model
     if args.fine_tune:
@@ -85,3 +95,22 @@ if __name__ == "__main__":
 
         print("\nGenerated Proposal:\n")
         print(completions)
+
+    # Command to generate a proposal in resopnse to a provided job post
+    if args.generate_cover_letter:
+        job_url = input("Enter the Upwork job post URL: ").strip()
+
+        # Extract the job ID from the URL using a regular expression
+        match = re.search(r'~[0-9a-zA-Z]{18}', job_url)
+        if match:
+            job_id = match.group()
+        else:
+            console.print("[red]Invalid Upwork job URL[/red]")
+            exit()
+
+        job = get_job_details(client, job_id)
+
+        cover_letter = generate_cover_letter(job['profile']['op_description'])
+
+        print("\nGenerated Proposal:\n")
+        print(cover_letter)
