@@ -17,6 +17,8 @@ An AI-driven Python application to fine-tune OpenAI models using your Upwork job
         - [5.2.4 List all fine-tuned models](#524-list-all-fine-tuned-models)
         - [5.2.5 Delete a fine-tuned model](#525-delete-a-fine-tuned-model)
         - [5.2.6 Generate a proposal for a single job](#526-generate-a-proposal-for-a-single-job)
+        - [5.2.7 Generate a JSON of prompt engineering data](#527-Generate-a-json-of-prompt-engineering-data)
+        - [5.2.8 Generate a cover letter for a single Upwork job using ChatCompletion](#528-Generate-a-cover-letter-for-a-single-Upwork-job-using-ChatCompletion)
 6. [Customizing and Extending the Application](#customizing-and-extending-the-application)
     - [6.1 Adding more API calls](#adding-more-api-calls)
     - [6.2 Adding new fine-tuning tasks](#adding-new-fine-tuning-tasks)
@@ -180,6 +182,26 @@ python3 main.py --generate-single-job-proposal --model-id <model_id> --job-url <
 ```
 
 Replace `<model_id>` with the ID of the fine-tuned model you want to use and `<job_url>` with the URL of the Upwork job post you want to create a proposal for. The script will generate a personalized proposal for the specified job post and display it in the terminal.
+
+### 5.2.7 Generate a JSON of prompt engineering data
+
+To generate a JSON file with the prompt engineering data based on your stored job applications and job details, use the `--generate-prompt-data` flag:
+
+```
+python3 main.py --generate-prompt-data
+```
+
+This will process your job application data and create a JSON file with prompt engineering data, which will be saved as `prompt_data.json`.
+
+### 5.2.8 Generate a cover letter for a single Upwork job using ChatCompletion
+
+To generate a cover letter for a single Upwork job using ChatCompletion, use the `--generate-cover-letter` flag:
+
+```
+python3 main.py --generate-cover-letter
+```
+
+You'll be prompted to enter the Upwork job post URL. The script will generate a personalized cover letter for the specified job post using the data from `prompt_data.json` and display it in the terminal.
 
 ## 6. Customizing and Extending the Application
 
