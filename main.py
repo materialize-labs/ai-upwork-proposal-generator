@@ -4,16 +4,7 @@ from rich.console import Console
 from modules.authentication import authenticate
 from modules.database import create_tables, get_last_fine_tuned_model
 from modules.upwork_calls import get_job_applications, get_job_details
-from modules.proposal_generator import (fetch_job_application_data,
-                                        prepare_training_data,
-                                        prepare_prompt_data,
-                                        save_data_to_json,
-                                        upload_training_data,
-                                        create_fine_tuned_model,
-                                        list_fine_tuned_models,
-                                        delete_fine_tuned_model,
-                                        generate_completions,
-                                        generate_cover_letter)
+from modules.proposal_generator import *
 
 console = Console()
 create_tables()

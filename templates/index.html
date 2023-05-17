@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upwork Cover Letter Generator</title>
+    <style>
+        .loader {
+            display: none;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        function showLoader() {
+            document.querySelector(".loader").style.display = "block";
+        }
+    </script>
+</head>
+<body>
+    <h1>Upwork Cover Letter Generator</h1>
+    <form action="{{ url_for('submit_job_url') }}" method="post" onsubmit="showLoader()">
+        <label for="job_url">Upwork Job URL:</label>
+        <input type="text" id="job_url" name="job_url" required>
+        <input type="submit" value="Generate Cover Letter">
+    </form>
+    <div class="loader"></div>
+    {% if cover_letter %}
+        <h2>Generated Cover Letter:</h2>
+        <p>{{ cover_letter }}</p>
+    {% endif %}
+    {% if error %}
+        <p>{{ error }}</p>
+    {% endif %}
+</body>
+</html>
