@@ -5,6 +5,9 @@ import time
 from tiktoken import get_encoding
 from modules.database import insert_fine_tuned_model, insert_model_response
 from modules import openai_client
+from rich.console import Console
+
+console = Console()
 
 encoding = get_encoding("cl100k_base")
 
@@ -106,10 +109,12 @@ def generate_completions(model, prompt, max_tokens, stop, n, temperature):
     return response
 
 def generate_cover_letter(new_job_description):
-
+    
+    console.print("[cyan]Loading prompt data...[/cyan]")
     # Load prompt data
     with open("prompt_data.json", "r") as f:
         prompt_data = json.load(f)
+    console.print("[green]Prompt data loaded successfully.[/green]")
 
     # Set up a message history for the conversation
     messages = [{"role": "system", "content": "You are an assistant that helps in generating cover letters based on previous job descriptions and cover letters."}]
@@ -119,30 +124,38 @@ def generate_cover_letter(new_job_description):
 
     # Add examples, staying within the token limit
     total_tokens = 0
+    console.print("[cyan]Preparing messages...[/cyan]")
     for example in prompt_data:
         job_message = f"Job description: {example['job_description']}"
         cover_message = f"Cover letter: {example['cover_letter']}"
         
         new_tokens = count_tokens(job_message) + count_tokens(cover_message) + 4  # Adding tokens for user and assistant roles, and some formatting tokens
-        if total_tokens + new_tokens + 50 < token_limit:  # Saving 50 tokens for new instruction and response
+        if total_tokens + new_tokens + 60 < token_limit:  # Saving 50 tokens for new instruction and response
             messages.append({"role": "user", "content": job_message})
             messages.append({"role": "assistant", "content": cover_message})
             total_tokens += new_tokens
         else:
             break
+    console.print("[green]Messages prepared successfully.[/green]")
 
-    messages.append({"role": "user", "content": f"Based on previous cover letters, generate a cover letter for this job description: {new_job_description}"})
+    messages.append({"role": "user", "content": f"Based on previous cover letters, generate a cover letter for this job description: {new_job_description}. Do not make up any projects that we haven't built in the past."})
 
+    console.print("[cyan]Making the API call...[/cyan]")
     # Make the API call
     response = openai.ChatCompletion.create(
         model="gpt-4",  # Assuming this is the model you want to use
         messages=messages,
+        temperature=0.8
     )
+    console.print("[green]API call completed successfully.[/green]")
 
     # Extract the generated cover letter
     generated_cover_letter = response['choices'][0]['message']['content']
-    print(response)
+
     # Save the response to a JSON file
+    console.print("[cyan]Saving response to JSON file...[/cyan]")
     with open('cover_letter.json', 'w') as f:
         json.dump(response, f, ensure_ascii=False, indent=4)
+    console.print("[green]Response saved successfully in 'cover_letter.json'.[/green]")
+
     return generated_cover_letter

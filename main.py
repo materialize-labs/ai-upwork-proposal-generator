@@ -108,9 +108,15 @@ if __name__ == "__main__":
             console.print("[red]Invalid Upwork job URL[/red]")
             exit()
 
+        console.print("[cyan]Fetching job details...[/cyan]")
         job = get_job_details(client, job_id)
+        console.print("[green]Job details fetched successfully.[/green]")
 
+        console.print(f"\nJob Description:\n{job['profile']['op_description']}\n")
+
+        console.print("[cyan]Generating cover letter...[/cyan]")
         cover_letter = generate_cover_letter(job['profile']['op_description'])
+        console.print("[green]Cover letter generated successfully.[/green]")
 
-        print("\nGenerated Proposal:\n")
-        print(cover_letter)
+        console.print("\nGenerated Cover Letter:\n")
+        console.print(cover_letter)
